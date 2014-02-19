@@ -29,7 +29,7 @@ task myConfig(dependsOn: "myInit") << {
     masterConfig.each { config ->
         println config
     }
-    header.size().times {print "-"}
+            header.size().times {print "-"}
 }
 
 task runTest(dependsOn: "myInit") << {
@@ -51,21 +51,67 @@ task cleanTest(dependsOn: "myInit") << {
     header.size().times {print "-"}
 }
 
-task backupDataFile << {
+task backupDataFile(type: Copy) << {
     def header = "---backupDataFile---"
     println header
 
     //your code goes here
+    def dataFile = [name: "DataFiles"]
+    def dataFileCopy = [name: "DataFiles - Copy"]
 
+    def copyFrom = new File("$rootWorkingFolder.location/$dataRuntime.name/$dataFile.name")
+    def copyOfDataFile = new File("$rootWorkingFolder.location/$dataRuntime.name/$dataFileCopy.name")
+    if(copyOfDataFile.mkdirs()) {
+        println "successfully created:$dataFileCopy.name"
+    }
+
+    from copyFrom
+    into copyOfDataFile
 
     header.size().times {print "-"}
 }
 
-task backupExecutionClient << {
+task backupExecutionClient(type: Copy) << {
     def header = "---backupExecutionClient---"
     println header
 
     //your code goes here
+    def executionClientCopy = [name: "executionClient - Copy"]
+
+    def copyFrom = new File("$rootWorkingFolder.location/$executionClient.name")
+    def copyOfExecutionClient = new File("$rootWorkingFolder.location/$executionClientCopy.name")
+    if(copyOfExecutionClient.mkdirs()) {
+        println "successfully created:$executionClientCopy.name"
+    }
+
+    from copyFrom
+    into copyOfExecutionClient
 
     header.size().times {print "-"}
+}
+
+task housekeepDataFile(type: Copy)  {
+    def header = "~~~housekeepDataFile~~~"
+    println header
+
+    def dataFile = [name: "DataFiles"]
+    def dataFileCopy = [name: "DataFiles - Copy"]
+
+    def dataFiles = new File("$rootWorkingFolder.location/$dataRuntime.name/$dataFile.name")
+    def copyOfDataFile = new File("$rootWorkingFolder.location/$dataRuntime.name/$dataFileCopy.name")
+    println copyOfDataFile
+    if (!copyOfDataFile.exists()) {
+        println "~~~copy not exists~~~"
+    }
+    if (copyOfDataFile.exists()) {
+        dataFiles.delete()
+
+        dataFiles.mkdirs()
+
+        from copyOfDataFile
+        into dataFiles
+
+        println "~~~housekeeping success!~~~"
+    }
+
 }
